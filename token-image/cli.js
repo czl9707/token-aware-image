@@ -66,6 +66,7 @@ if (command === "editor") {
     // 2. Start Vite dev server
     const vite = await createServer({
       root: join(__dirname, "src", "spa"),
+      publicDir: join(__dirname, "public"),
       server: {
         port: 5173,
         proxy: {

@@ -77,7 +77,7 @@ button:disabled { opacity: 0.4; cursor: default; }
 .component-tabs button { font-size: var(--ed-text-xs); padding: var(--ed-space-1) var(--ed-space-25); }
 .component-tabs button.active { background: var(--color-accent, #D71921); border-color: var(--color-accent, #D71921); color: #fff; }
 .preview-container { flex: 1; display: flex; align-items: center; justify-content: center; background: var(--color-surface, #141414); border-radius: var(--radius-md, 6px); border: 1px solid var(--color-border, #2A2A2A); overflow: hidden; position: relative; min-height: 300px; transition: background-color 300ms ease, border-color 300ms ease; }
-.preview-frame { transform-origin: top left; }
+.preview-frame { transform-origin: center center; }
 .preview-frame,
 .preview-frame * {
   transition: color 300ms ease, background-color 300ms ease, border-color 300ms ease,

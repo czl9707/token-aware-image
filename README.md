@@ -1,4 +1,8 @@
-# Token-Aware-Image
+<p align="center">
+  <img src="token-image/public/icon.png" alt="Token-Image logo" width="120" />
+</p>
+
+<h1 align="center">Token-Aware-Image</h1>
 
 One pain point in AI image generation is the last mile of pixel adjustment. Token-Image is a skill trying to bridge that gap.
 
@@ -8,26 +12,47 @@ Instead of generating a flat image, Token-Image writes React components backed b
 Prompt → AI agents write React components → Token-controlled design → PNG via Playwright
 ```
 
+<!-- TODO: Add screenshot of the visual editor here -->
+<!-- ![Visual Editor](docs/editor-screenshot.png) -->
+
 ## Installation
 
 ### Coding agent skill (any agent)
 
 ```bash
-npx skills install
+npx skills install https://github.com/czl9707/token-aware-image   
 ```
 
 Then point it at this repository. Works with Claude Code, opencode, and any agent that supports the skills format.
 
 ### Claude Code Marketplace
 
-Install directly from the Claude Code marketplace — search for **token-aware-image**.
+``` bash
+/plugin marketplace add czl9707/token-aware-image
+/plugin install token-image
+```
 
 ## Quick Start
 
-1. Open your project in a coding agent that has this skill installed
-2. Ask it to generate images — e.g. *"Build 4 blog banners for my React series"*
-3. Pick a preset when prompted (nothing, brutalism, glassmorphism, etc.)
-4. Get themed PNG images rendered via Playwright
+1. Image Generation
+
+```bash
+/token-image create 3 images for me for <topic>.
+```
+  
+  Agent will ask for theme, conents, layout, branding information.
+
+2. Finetune design tokens.
+
+``` bash
+Launch the token editor please.
+```
+
+3. Render Images
+
+``` bash
+Render them please.
+```
 
 ## The Token System
 
@@ -35,24 +60,52 @@ Every visual property is a token — a named value in a JSON file. Change `color
 
 A token file looks like this:
 
-```json
+```js
 {
   "color": {
-    "bg": "#000000",
-    "surface": "#111111",
-    "border": "#333333",
-    "text": "#E8E8E8",
-    "accent": "#D71921"
+    "bg": "#0A0A1A",
+    "surface": "rgba(255,255,255,0.08)",
+    // ...
+  },
+  "fontFamily": {
+    "display": "Outfit",
+    "body": "Work Sans",
+    "mono": "JetBrains Mono"
   },
   "fontSize": {
     "hero": 72,
     "h1": 48,
-    "h2": 36,
-    "body": 16
+    // ...
   },
-  "spacing": { "xs": 4, "sm": 8, "md": 16, "lg": 24, "xl": 32 },
-  "radius": { "sm": 4, "md": 8, "lg": 16 }
+  "fontWeight": {
+    "normal": 400,
+    "bold": 700
+  },
+  "lineHeight": {
+    "tight": 1.0,
+    "normal": 1.5
+  },
+  "letterSpacing": {
+    "tight": -0.03,
+    "normal": 0,
+    "wide": 0.08
+  },
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    // ...
+  },
+  "radius": {
+    "sm": 8,
+    "md": 16,
+    "lg": 24
+  },
+  "opacity": {
+    "muted": 0.6,
+    "subtle": 0.4
+  }
 }
+
 ```
 
 Tokens cover color, font families, sizes, weights, line heights, letter spacing, spacing, border radius, and opacity. There are 13 built-in presets, or you can create your own.
@@ -64,9 +117,6 @@ A standalone CLI for rendering and visually editing your images outside the agen
 ```bash
 npm install -g @zane-chen/token-image
 ```
-
-<!-- TODO: Add screenshot of the visual editor here -->
-<!-- ![Visual Editor](docs/editor-screenshot.png) -->
 
 | Command | Description |
 |---------|-------------|
@@ -96,20 +146,6 @@ The visual editor gives you a live preview with color pickers, sliders for spaci
 | `neumorphism` | Soft extruded UI | Clay gray + violet | Plus Jakarta Sans, JetBrains Mono |
 | `modern-dark` | Cinematic dark blobs | Near-black + indigo | Inter, JetBrains Mono |
 | `sketch` | Hand-drawn notebook | Warm paper + pencil + red marker | Kalam, Patrick Hand, Caveat |
-
-## Architecture
-
-```
-Component.tsx → Vite dev server → Playwright screenshot → PNG
-```
-
-Components are React `.tsx` files that:
-- Declare their size with `// @size WxH`
-- Export a default function receiving `{ tokens }`
-- Import a shared stylesheet and viewport wrapper
-- Render HTML/CSS using token-driven CSS custom properties
-
-The rendering pipeline flattens tokens to CSS variables, serves components through a temporary Vite dev server, and screenshots them with Playwright at the declared dimensions.
 
 ## Creating a Custom Preset
 
