@@ -76,6 +76,12 @@ if (command === "editor") {
           allow: [projectRoot, __dirname],
         },
       },
+      resolve: {
+        dedupe: ["react", "react-dom"],
+      },
+      optimizeDeps: {
+        include: ["react-dom/client"],
+      },
       plugins: [
         react(),
       ],
