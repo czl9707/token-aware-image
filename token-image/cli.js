@@ -33,14 +33,13 @@ Run from a .token-image/ workspace directory.`);
 }
 
 if (command === "render") {
-  const renderPath = join(__dirname, "src", "render.ts");
+  const renderPath = join(__dirname, "dist", "render.js");
   const rest = process.argv.slice(3);
 
   const { execFileSync } = await import("child_process");
-  const tsxPath = join(__dirname, "node_modules", ".bin", "tsx");
 
   try {
-    execFileSync(tsxPath, [renderPath, ...rest], { cwd: projectRoot, stdio: "inherit" });
+    execFileSync(process.execPath, [renderPath, ...rest], { cwd: projectRoot, stdio: "inherit" });
   } catch (err) {
     process.exit(err.status ?? 1);
   }

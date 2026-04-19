@@ -44,11 +44,27 @@ jobs:
       - name: Verify package contents
         run: npm pack --dry-run
 
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Version bump
-        run: "npm version ${{ inputs.release_type }} -m 'chore(release): %s'"
+        id: bump
+        run: |
+          NEW_VERSION=$(npm version ${{ inputs.release_type }} --no-git-tag-version)
+          echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and tag
+        working-directory: .
+        run: |
+          git add token-image/package.json token-image/package-lock.json
+          git commit -m "chore(release): ${{ steps.bump.outputs.version }}"
+          git tag ${{ steps.bump.outputs.version }}
 
       - name: Publish
         run: npm publish --access public
 
       - name: Push version commit and tag
-        run: git push origin HEAD:${{ github.ref_name }}
+        working-directory: .
+        run: git push --follow-tags origin HEAD:${{ github.ref_name }}
