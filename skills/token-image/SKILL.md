@@ -196,30 +196,52 @@ Do NOT run the Reviewer on shared files — they are structural, not design-heav
 
 ### Step 3: Dispatch per-image agents
 
-For each image, dispatch a Writer+Reviewer pair in parallel using the Agent tool.
+This step runs in rounds. Each round: all Writers in parallel → batch render → all Reviewers in parallel. Max 3 rounds per image.
 
-Tell each Writer agent:
-- The content brief for this specific image (from Step 1), the format spec (width, height, name), the **layout description** (from the brief's `Layout:` field), the creative direction, and the file index
-- To read `<skill_base_dir>/prompts/writer.md` for full instructions
-- To read `.token-image/src/token.active.json` for tokens
-- To read `.token-image/src/viewport.tsx` for the Viewport component
-- To read `.token-image/src/styles.css` for available CSS classes (the "available classes" comment block at the top lists all layout classes)
-- To read `<skill_base_dir>/references/components.md` for component patterns
-- To read `<skill_base_dir>/assets/<preset>/design-guide.md` for the design guide
-- The preset name
+**Round N:**
 
-The Writer writes the component directly to `.token-image/src/<format>-<index>.tsx`.
+1. **Dispatch Writer agents** for all images in parallel using the Agent tool.
 
-Tell each Reviewer agent:
-- The content brief for this image
-- To read `<skill_base_dir>/prompts/reviewer.md` for full instructions
-- To read `.token-image/src/viewport.tsx` for the Viewport component
-- To read `.token-image/src/styles.css` for the shared stylesheet
-- To read `.token-image/src/token.active.json` for tokens
-- To read `.token-image/src/<format>-<index>.tsx` for the component to review
-- The Reviewer renders the component to PNG itself (see reviewer prompt for instructions), then uses multi-modal capabilities to check both code compliance AND visual quality
+   Tell each Writer agent:
+   - The content brief for this specific image (from Step 1), the format spec (width, height, name), the **layout description** (from the brief's `Layout:` field), the creative direction, and the file index
+   - To read `<skill_base_dir>/prompts/writer.md` for full instructions
+   - To read `.token-image/src/token.active.json` for tokens
+   - To read `.token-image/src/viewport.tsx` for the Viewport component
+   - To read `.token-image/src/styles.css` for available CSS classes (the "available classes" comment block at the top lists all layout classes)
+   - To read `<skill_base_dir>/references/components.md` for component patterns
+   - To read `<skill_base_dir>/assets/<preset>/design-guide.md` for the design guide
+   - The preset name
 
-Run max 3 Writer→Reviewer rounds per image.
+   The Writer writes the component directly to `.token-image/src/<format>-<index>.tsx`.
+
+2. **Batch render all components.** After all Writers complete, run:
+
+   ```bash
+   cd .token-image && npm run render
+   ```
+
+   This renders every `.tsx` → `.png` in one pass (single Playwright session). The PNGs are saved to `.token-image/src/<format>-<index>.png`.
+
+3. **Dispatch Reviewer agents** for all images in parallel using the Agent tool.
+
+   Tell each Reviewer agent:
+   - The content brief for this image
+   - To read `<skill_base_dir>/prompts/reviewer.md` for full instructions
+   - To read `.token-image/src/viewport.tsx` for the Viewport component
+   - To read `.token-image/src/styles.css` for the shared stylesheet
+   - To read `.token-image/src/token.active.json` for tokens
+   - To read `.token-image/src/<format>-<index>.tsx` for the component to review
+   - To read `.token-image/src/<format>-<index>.png` for the rendered image (already rendered by the orchestrator — reviewer does NOT run render)
+   - The Reviewer uses multi-modal capabilities to check both code compliance AND visual quality
+
+4. **Collect results.** For any image that didn't PASS, carry it into the next round (updated Writer + re-render that component + Reviewer again). Images that PASS are done.
+
+   For re-renders of individual components in subsequent rounds:
+   ```bash
+   cd .token-image && npm run render -- <format>-<index>
+   ```
+
+Run max 3 rounds total. After 3 rounds, accept whatever state the remaining images are in.
 
 ---
 
@@ -235,12 +257,11 @@ Save files to `.token-image/src/`:
 
 Create the `.token-image/src/` directory if it doesn't exist.
 
-After all images are written, summarize:
+After all images are written and reviewed, summarize:
 - How many components were generated
 - Any images that hit the 3-round limit with remaining issues (and what they are)
-- Reminder: run `cd .token-image && npm run token-image render [component] [--scale <n>]` to convert components to PNG
-  - Omit component name to render all, or pass a bare name like `square-1`
-  - `--scale 2` outputs at 2x dimensions (e.g. 1200x630 → 2400x1260)
+- All PNGs have been rendered to `.token-image/src/`
+- Reminder: run `cd .token-image && npm run render [component]` to re-render if needed
 
 ---
 

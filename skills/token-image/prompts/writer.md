@@ -58,6 +58,7 @@ If the layout description doesn't work for the content, use your judgment. Bette
 - Never import token files directly. Acceptable to hardcode: SVG path data, aspect ratio math, transform calculations.
 - **No standalone decorative elements** (dots, shapes, circles, lines) unless the creative direction explicitly requests them. Background patterns applied to container divs are fine.
 - **All spacing between elements is handled by flex/grid gap** — the viewport inner div, `.content-stack`, `.numbered-list`, etc. all use `gap`. Headings have `margin: 0`. Do not add `margin-top` or `margin-bottom` to headings.
+- **Prefer multiple direct children inside Viewport** — headings, layout blocks, and metadata should be separate children so the viewport's built-in gap handles spacing. Do NOT wrap everything in a single `<div>` — that collapses the viewport gap to zero. If a single wrapper div is truly needed for layout reasons, it MUST replicate the viewport inner wrapper's flex behavior: `flex`, `flexDirection`, `justifyContent`, `alignItems` and etc.
 - **Grid containers** (`grid-2`, `grid-3`) include `width: 100%` in the stylesheet. No need to add inline width.
 
 Write the file directly to disk: `.token-image/src/<format>-<index>.tsx`

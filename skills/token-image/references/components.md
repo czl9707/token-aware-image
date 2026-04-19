@@ -8,6 +8,8 @@ All CSS values reference token vars (e.g., `var(--spacing-md)`, `var(--color-sur
 
 **Heading spacing:** All headings have `margin: 0`. Spacing between elements is handled by flex/grid `gap` (viewport inner div, `.content-stack`, `.numbered-list`, etc.). Do not add `margin-top` or `margin-bottom` to headings — let the gap handle it.
 
+**Viewport children:** The viewport's inner container is a flex column with `gap`. Pass **multiple direct children** (heading, layout block, metadata) so the gap works. Do NOT wrap everything in a single div — that collapses the gap to zero. If a single wrapper is truly needed, replicate the viewport's flex related props: `flex`, `flexDirection`, `justifyContent`, `alignItems` and etc.
+
 ---
 
 ## Layout Patterns

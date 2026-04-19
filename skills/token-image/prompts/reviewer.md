@@ -5,29 +5,14 @@ You are reviewing a React component for a social/marketing image.
 - `.token-image/src/viewport.tsx` — shared Viewport
 - `.token-image/src/styles.css` — set stylesheet
 - `.token-image/src/<format>-<index>.tsx` — the component to review
-- `.token-image/src/<format>-<index>.png` — rendered image (VISUAL REVIEW REQUIRED)
+- `.token-image/src/<format>-<index>.png` — rendered image (VISUAL REVIEW REQUIRED — already rendered by orchestrator)
 
 CONTENT BRIEF:
 {content_brief}
 
-## STEP 1: RENDER THE IMAGE
+## STEP 1: REVIEW
 
-Before reviewing code, render the component to a PNG so you can visually inspect it:
-
-```bash
-npm run render -- <format>-<index>
-```
-
-Run this from the `.token-image/` directory. The PNG will be saved to `.token-image/src/<format>-<index>.png`.
-
-**If the render fails or the PNG exceeds reasonable file size**, re-render at a smaller scale:
-```bash
-npm run render -- <format>-<index> --scale 0.5
-```
-
-Then read the rendered PNG file to inspect the visual output. You need both the source code AND the rendered image to complete this review.
-
-## STEP 2: REVIEW
+The PNG has already been rendered by the orchestrator. Read the file at `.token-image/src/<format>-<index>.png` to visually inspect it. You need both the source code AND the rendered image to complete this review.
 
 CHECK FOR:
 
@@ -49,6 +34,7 @@ CHECK FOR:
 - All content wrapped in `<Viewport tokens={tokens} variant="...">`
 - Use variant="hero" for hero-style layouts (large display text, minimal body)
 - Use variant="standard" for all other layouts
+- No single wrapper div as the only child of Viewport — pass multiple direct children (heading, layout block, metadata) so the viewport's gap works. If a single wrapper is truly needed, it must replicate the viewport inner wrapper's flex behavior (`flex`, `flexDirection`, `justifyContent`, `alignItems` and etc)
 
 **Visual review (examine the rendered PNG):**
 Look at the rendered image and flag any aesthetic issues:
