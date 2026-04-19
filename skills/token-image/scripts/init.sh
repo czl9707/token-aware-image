@@ -2,41 +2,64 @@
 # token-image init script
 # Bootstraps a .token-image/ workspace for generating and editing themed images.
 #
-# Usage: bash <skill_base_dir>/scripts/init.sh --preset <name>
+# Usage:
+#   bash <skill_base_dir>/scripts/init.sh --preset <name>
+#   bash <skill_base_dir>/scripts/init.sh --tokens <path/to/tokens.json>
 #
 # Run this once per project before using the token-image skill.
-# --preset is required. Available presets match subdirectories in assets/.
+# Exactly one of --preset or --tokens is required.
 
 set -e
-
-PRESET=""
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    --preset) PRESET="$2"; shift 2 ;;
-    *) echo "Unknown option: $1"; exit 1 ;;
-  esac
-done
-
-if [ -z "$PRESET" ]; then
-  echo "Error: --preset is required."
-  echo "Usage: bash <skill_base_dir>/scripts/init.sh --preset <name>"
-  echo ""
-  echo "Available presets:"
-  SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-  ls "$SKILL_DIR/assets/" | sed 's/^/  /'
-  exit 1
-fi
 
 SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORKSPACE=".token-image"
 
-if [ ! -d "$SKILL_DIR/assets/$PRESET" ]; then
+PRESET=""
+TOKENS_FILE=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --preset) PRESET="$2"; shift 2 ;;
+    --tokens) TOKENS_FILE="$2"; shift 2 ;;
+    *) echo "Unknown option: $1"; exit 1 ;;
+  esac
+done
+
+if [ -z "$PRESET" ] && [ -z "$TOKENS_FILE" ]; then
+  echo "Error: --preset or --tokens is required."
+  echo "Usage:"
+  echo "  bash <skill_base_dir>/scripts/init.sh --preset <name>"
+  echo "  bash <skill_base_dir>/scripts/init.sh --tokens <path/to/tokens.json>"
+  echo ""
+  echo "Available presets:"
+  ls "$SKILL_DIR/assets/" | sed 's/^/  /'
+  exit 1
+fi
+
+if [ -n "$PRESET" ] && [ -n "$TOKENS_FILE" ]; then
+  echo "Error: --preset and --tokens are mutually exclusive. Use one or the other."
+  exit 1
+fi
+
+if [ -n "$PRESET" ] && [ ! -d "$SKILL_DIR/assets/$PRESET" ]; then
   echo "Error: Preset '$PRESET' not found in $SKILL_DIR/assets/"
   ls "$SKILL_DIR/assets/" | sed 's/^/  /'
   exit 1
 fi
 
-echo "Setting up token-image workspace (preset: $PRESET)..."
+if [ -n "$TOKENS_FILE" ]; then
+  if [ ! -f "$TOKENS_FILE" ]; then
+    echo "Error: Token file not found: $TOKENS_FILE"
+    exit 1
+  fi
+  TOKENS_FILE="$(cd "$(dirname "$TOKENS_FILE")" && pwd)/$(basename "$TOKENS_FILE")"
+fi
+
+if [ -n "$PRESET" ]; then
+  echo "Setting up token-image workspace (preset: $PRESET)..."
+else
+  echo "Setting up token-image workspace (custom tokens: $TOKENS_FILE)..."
+fi
 
 # 1. Create workspace directories
 mkdir -p "$WORKSPACE/src"
@@ -58,12 +81,15 @@ for preset_dir in "$SKILL_DIR"/assets/*/; do
   done
 done
 
-# 3. Set src/token.active.json from chosen preset if not present
+# 3. Set src/token.active.json from chosen preset or custom tokens file if not present
 if [ -f "$WORKSPACE/src/token.active.json" ]; then
   echo "  ✓ $WORKSPACE/src/token.active.json already exists, skipping"
-else
+elif [ -n "$PRESET" ]; then
   cp "$SKILL_DIR/assets/$PRESET/tokens.json" "$WORKSPACE/src/token.active.json"
   echo "  ✓ Created $WORKSPACE/src/token.active.json from $PRESET preset"
+elif [ -n "$TOKENS_FILE" ]; then
+  cp "$TOKENS_FILE" "$WORKSPACE/src/token.active.json"
+  echo "  ✓ Created $WORKSPACE/src/token.active.json from $TOKENS_FILE"
 fi
 
 # 4. package.json
@@ -127,4 +153,5 @@ echo "  3. npm run render              # render all .tsx → .png"
 echo "     npm run render -- square-1  # render one component"
 echo "     npm run render:2x           # render all at 2x DPI"
 echo "  4. npm run editor              # launch visual token editor"
-echo "  5. Switch presets: copy any tokens/<preset>/tokens.json over src/token.active.json (currently: $PRESET)"
+ACTIVE_SOURCE="${PRESET:-custom tokens file}"
+echo "  5. Switch presets: copy any tokens/<preset>/tokens.json over src/token.active.json (currently: $ACTIVE_SOURCE)"

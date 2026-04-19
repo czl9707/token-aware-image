@@ -25,7 +25,7 @@ Generate a series of social/marketing image React components in the same theme.
 
 | File | Purpose | When to use |
 |------|---------|-------------|
-| `scripts/init.sh` | Bootstrap workspace (tokens, deps, `--preset <name>` required) | After intake: if `.token-image/` workspace missing |
+| `scripts/init.sh` | Bootstrap workspace (tokens, deps, `--preset <name>` or `--tokens <path>` required) | After intake: if `.token-image/` workspace missing |
 | `assets/<preset>/tokens.json` | Token set for the chosen design system | Selected during intake; copied to `.token-image/tokens/` by init.sh |
 | `assets/<preset>/design-guide.md` | Design principles and stylesheet overrides for the chosen token set | Read during intake after preset selection; injected into agent prompts |
 | `.token-image/src/token.active.json` | Project's active token file | Read in full during intake; passed to every agent |
@@ -53,8 +53,8 @@ Check for `.token-image/` workspace directory in the project root.
 Before generating anything, ask the user these questions. Skip any that were already answered in the initial prompt.
 
 1. **Theme** — Which token set should I use?
-   - Available presets: {list all subdirectories in `<skill_base_dir>/assets/`}
-   - Or paste a path to your own `tokens.json` (with optional `design-guide.md` alongside it)
+    - Available presets: {list all subdirectories in `<skill_base_dir>/assets/`}
+    - Or paste a path to your own `tokens.json` (with optional `design-guide.md` alongside it). This will be passed as `--tokens <path>` to init.sh.
 
 2. **Images** — What should each image be about, and how many?
    (e.g. "4 banners: Hooks, Context, Suspense, Server Components")
@@ -76,18 +76,20 @@ Before generating anything, ask the user these questions. Skip any that were alr
 
 Wait for the user's answers before proceeding. If the user says "auto" or leaves something blank, make a reasonable choice and state it.
 
-After the user selects a preset:
-- If workspace is missing, run init.sh with the chosen preset:
+After the user selects a preset or provides a custom token file:
+- If workspace is missing, run init.sh:
   ```bash
+  # For a built-in preset:
   bash <skill_base_dir>/scripts/init.sh --preset <chosen_preset>
+  # For a custom token file:
+  bash <skill_base_dir>/scripts/init.sh --tokens <path/to/tokens.json>
   ```
 - If workspace exists but uses a different preset, copy the chosen preset's tokens to active:
   ```bash
   cp .token-image/tokens/<chosen_preset>/tokens.json .token-image/src/token.active.json
   ```
-- Read `<skill_base_dir>/assets/<preset>/tokens.json` into context as `{token_json}`
-- Read `<skill_base_dir>/assets/<preset>/design-guide.md` into context as `{design_guide}`
-- If a custom path was provided: read the custom `tokens.json` and optionally `design-guide.md` if it exists alongside it
+- For a built-in preset: read `<skill_base_dir>/assets/<preset>/tokens.json` into context as `{token_json}` and `<skill_base_dir>/assets/<preset>/design-guide.md` into context as `{design_guide}`
+- For a custom token file: read the custom `tokens.json` and optionally `design-guide.md` if it exists alongside it
 
 Once you have all answers, confirm the plan:
 ```

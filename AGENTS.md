@@ -9,7 +9,7 @@ This repository has two parts:
 - **`skills/token-image/`** — A coding agent skill that orchestrates AI agents to write themed image React components
 - **`token-image/`** — npm CLI package (`v0.1.0`, ESM, `bin: token-image`) with `render` and `editor` subcommands
 
-Components live in `.token-image/src/` and render to PNG via Playwright browser screenshot. The workspace is bootstrapped by `init.sh --preset <name>`.
+Components live in `.token-image/src/` and render to PNG via Playwright browser screenshot. The workspace is bootstrapped by `init.sh --preset <name>` or `init.sh --tokens <path/to/tokens.json>`.
 
 ## Commands
 
@@ -47,7 +47,7 @@ Components must:
 
 **Phase 0: Pre-flight** — Check for `.token-image/` workspace, read active tokens.
 
-**Phase 1: Intake** — Ask user for theme (13 presets or custom), images, format, and per-image layout. Run `init.sh --preset <name>` if workspace missing.
+**Phase 1: Intake** — Ask user for theme (13 presets or custom token file), images, format, and per-image layout. Run `init.sh --preset <name>` or `init.sh --tokens <path>` if workspace missing.
 
 **Phase 2: Generate**
 - Step 1: Orchestrator writes content briefs with creative direction per image
@@ -58,7 +58,7 @@ Components must:
 
 ### Token System
 
-Tokens are stored in `assets/<preset>/tokens.json`. Init copies all presets to `.token-image/tokens/<preset>/` and the chosen preset's tokens to `.token-image/src/token.active.json`.
+Tokens are stored in `assets/<preset>/tokens.json`. Init copies all presets to `.token-image/tokens/<preset>/` and the chosen preset's tokens (or a custom token file via `--tokens`) to `.token-image/src/token.active.json`.
 
 **Unit handling** (`token-image/src/spa/utils/tokens.ts`):
 - `TOKEN_UNITS`: fontSize/spacing/radius → px, letterSpacing → em
@@ -84,7 +84,7 @@ Express API (`src/server/api.js`) provides CRUD for tokens, presets, and compone
 | File | Purpose |
 |------|---------|
 | `SKILL.md` | Skill definition (4 phases, intake questions, agent dispatch workflow) |
-| `scripts/init.sh` | Bootstraps `.token-image/` workspace (`--preset <name>` required) |
+| `scripts/init.sh` | Bootstraps `.token-image/` workspace (`--preset <name>` or `--tokens <path>`) |
 | `prompts/writer.md` | Writer agent prompt |
 | `prompts/reviewer.md` | Reviewer agent prompt |
 | `prompts/shared.md` | Shared files agent prompt (Viewport + Stylesheet) |
@@ -169,6 +169,8 @@ node --test tests/api.test.js
 ```bash
 cd /path/to/test-project
 bash /path/to/skills/token-image/scripts/init.sh --preset nothing
+# or with a custom token file:
+bash /path/to/skills/token-image/scripts/init.sh --tokens /path/to/my-tokens.json
 
 # Run the skill in your coding agent to generate components
 

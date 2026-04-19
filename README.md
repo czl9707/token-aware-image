@@ -149,9 +149,14 @@ The visual editor gives you a live preview with color pickers, sliders for spaci
 
 ## Creating a Custom Preset
 
-1. Create `assets/<your-preset>/tokens.json` with your token values
-2. Create `assets/<your-preset>/design-guide.md` with design principles and stylesheet overrides
-3. Run `init.sh --preset <your-preset>` — it auto-discovers new presets
+
+Create you own `token.json` and tell agent when it ask for token preset.
+
+Alternatively run
+
+```bash
+bash init.sh --tokens /path/to/my-tokens.json
+```
 
 ## License
 
