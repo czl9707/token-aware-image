@@ -37,7 +37,7 @@ Then point it at this repository. Works with Claude Code, opencode, and any agen
 1. Image Generation
 
 ```bash
-/token-image create 3 images for me for <topic>.
+/token-image create 3 images about <topic>.
 ```
   
   Agent will ask for theme, conents, layout, branding information.

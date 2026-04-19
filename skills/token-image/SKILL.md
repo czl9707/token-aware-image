@@ -65,14 +65,17 @@ Before generating anything, ask the user these questions. Skip any that were alr
    - `og-image` 1200×630
    - `custom` — User specify width and height
 
-4. **Layout** — Which layout for EACH image? Describe what goes where, or pick a pattern:
-    - `hero` — Full-canvas title, no body content
-    - `split` — Two-column, describe what goes on each side
-    - `grid` — Title above, card grid below (2 or 3 columns)
-    - `title-body` — Single column, title + body text
-    - `numbered-list` — Numbered steps or items
-    - `auto` — I pick based on content
-    - Or describe the layout you want (e.g., "title top-left, 2x2 card grid on right")
+4. **Layout** — Describe the layout for each image.
+     What goes where? (e.g., "title top-left, 2x2 card grid on right",
+     "full-canvas hero with oversized title", "numbered steps down the left side")
+     You can describe one layout for all images or a different one per image.
+     If you're not sure, say "auto" and I'll pick based on content.
+
+5. **Branding** — What should be consistent across all images?
+     (e.g., "logo bottom-right", "series label 'REACT SERIES · PART N' in footer",
+     "no branding", "subtle watermark center-bottom")
+     This becomes part of the shared Viewport that wraps every image.
+     If none, say "none" and I'll keep the viewport clean.
 
 Wait for the user's answers before proceeding. If the user says "auto" or leaves something blank, make a reasonable choice and state it.
 
@@ -96,6 +99,7 @@ Once you have all answers, confirm the plan:
 Got it. Here's what I'll generate:
 - Format: {format} ({width}×{height})
 - Theme: {token_file}
+- Branding: {user's branding spec from Q5}
 - Images:
   1. {title 1} — {subtitle 1}
     - Layout: {layout description 1}
@@ -119,9 +123,9 @@ Do NOT delegate this step. The orchestrator (you) writes a content brief for eve
 
 Based on the user's intake answers, produce two things:
 
-**A. Shared element inventory** — decide what's shared across the whole set:
+**A. Shared element inventory** — decide what's shared across the whole set, informed by the user's branding answer (Q5):
 - Viewport variant needed (hero for one image, standard for the rest)
-- Whether branding or metadata slots are needed
+- Branding and metadata placement from user's Q5 answer (logo position, series label, watermark, etc.)
 - Any special alignment or spacing requirements
 - Write this as a short list the shared-files agent will use.
 

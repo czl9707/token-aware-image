@@ -40,15 +40,11 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
 
-      - name: Version bump
-        if: inputs.version != ''
-        run: npm version ${{ inputs.version }} -m "chore(release): %s"
-
       - name: Verify package contents
         run: npm pack --dry-run
 
       - name: Version bump
-        run: npm version ${{ inputs.release_type }} -m "chore(release): %s"
+        run: "npm version ${{ inputs.release_type }} -m 'chore(release): %s'"
 
       - name: Publish
         run: npm publish --provenance --access public
