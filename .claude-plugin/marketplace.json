@@ -1,0 +1,32 @@
+{
+  "name": "token-aware-image",
+  "owner": {
+    "name": "Zane Chen"
+  },
+  "metadata": {
+    "description": "Token-aware image generation — React components backed by design tokens, rendered to PNG via Playwright"
+  },
+  "plugins": [
+    {
+      "name": "token-image",
+      "source": "./plugins/token-image",
+      "description": "Generate themed social/marketing image React components using design tokens. 13 presets, multi-layout, PNG output via Playwright.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Zane Chen"
+      },
+      "homepage": "https://github.com/czl9707/token-aware-image",
+      "repository": "https://github.com/czl9707/token-aware-image",
+      "license": "MIT",
+      "keywords": [
+        "design-tokens",
+        "image-generation",
+        "react",
+        "playwright",
+        "social-images",
+        "banners",
+        "og-images"
+      ]
+    }
+  ]
+}
