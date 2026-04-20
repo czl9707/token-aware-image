@@ -12,8 +12,7 @@ Instead of generating a flat image, Token-Image writes React components backed b
 Prompt → AI agents write React components → Token-controlled design → PNG via Playwright
 ```
 
-<!-- TODO: Add screenshot of the visual editor here -->
-<!-- ![Visual Editor](docs/editor-screenshot.png) -->
+https://github.com/user-attachments/assets/bf2b7956-18d4-44c9-a948-9b54b398c792
 
 ## Installation
 
