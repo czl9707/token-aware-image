@@ -1,6 +1,6 @@
 {
   "name": "@zane-chen/token-image",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "CLI toolchain for token-image design system — render and editor",
   "author": "Zane Chen",
   "license": "MIT",
