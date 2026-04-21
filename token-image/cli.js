@@ -6,7 +6,20 @@ import { existsSync } from "fs";
 import { createServer } from "vite";
 import react from "@vitejs/plugin-react";
 import open from "open";
+import { chromium } from "playwright";
 import { createAPI } from "./src/server/api.js";
+
+function ensurePlaywright() {
+  try {
+    const execPath = chromium.executablePath();
+    if (execPath && existsSync(execPath)) return;
+  } catch {}
+  console.error(
+    "Error: Playwright browser not installed.\n" +
+    "Install it with: npx playwright install chromium"
+  );
+  process.exit(1);
+}
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = process.cwd();
@@ -30,6 +43,10 @@ Options:
 
 Run from a .token-image/ workspace directory.`);
   process.exit(0);
+}
+
+if (command === "render" || command === "editor") {
+  ensurePlaywright();
 }
 
 if (command === "render") {

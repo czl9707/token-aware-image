@@ -46,6 +46,14 @@ Check for `.token-image/` workspace directory in the project root.
 - If present: note that workspace exists. Read `.token-image/src/token.active.json` for reference.
 - If missing: note that workspace needs initialization. Do NOT run init.sh yet — wait until Phase 1 when the user picks a preset.
 
+Ensure Playwright browsers are installed:
+
+```bash
+npx playwright install chromium
+```
+
+This is idempotent — if already installed, it's a no-op.
+
 ---
 
 ## Phase 1: Intake
@@ -263,18 +271,25 @@ After all images are written and reviewed, summarize:
 - All PNGs have been rendered to `.token-image/src/`
 - Reminder: run `cd .token-image && npm run render [component]` to re-render if needed
 
+Then automatically launch the visual editor:
+
+```bash
+cd .token-image && npm run editor
+```
+
+This opens the editor in the user's browser so they can visually inspect and tweak tokens immediately.
+
 ---
 
 ## Phase 4: Next Steps
 
 After generating all components, tell the user:
 
-"Done. To render and visually edit:
-  1. cd .token-image
-  2. npm run render                     # render all .tsx → .png
-     npm run render -- square-1         # render one by name
-     npm run render:2x -- square-1      # render one at 2x dimensions
-  3. npm run editor                     # launch visual token editor"
+"Done. The visual editor should be open in your browser. Useful commands:
+  npm run render                     # re-render all .tsx → .png
+  npm run render -- square-1         # render one by name
+  npm run render:2x -- square-1      # render one at 2x dimensions
+  npm run editor                     # re-launch visual token editor (if closed)"
 
 
 ## IMPORTANT
