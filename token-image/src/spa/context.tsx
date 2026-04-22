@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { flattenToCSSVars, setNestedValue } from "./utils/tokens";
 import { useGoogleFonts } from "./hooks/useGoogleFonts";
-import * as api from "./api";
+import * as api from "./token-api";
 
 interface ComponentInfo {
   name: string;

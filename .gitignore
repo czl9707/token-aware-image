@@ -1,5 +1,8 @@
 **/node_modules
 **/dist/
 .claude
-docs/superpowers
+**/docs/superpowers
+**/docs/plans
 .worktrees
+
+TODO.md

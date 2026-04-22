@@ -1,19 +1,17 @@
 import { useEffect } from "react";
 
+const GOOGLE_FONTS_WEIGHTS = "100;200;300;400;500;600;700;800;900";
+
 export function useGoogleFonts(tokens: Record<string, any>) {
   const fontFamilyKey = JSON.stringify(tokens.fontFamily);
-  const fontWeightKey = JSON.stringify(tokens.fontWeight);
 
   useEffect(() => {
     const families = tokens.fontFamily;
-    const weights = tokens.fontWeight;
-    if (!families || !weights) return;
+    if (!families) return;
     const familyValues = [...new Set(Object.values(families) as string[])];
-    const weightValues = Object.values(weights) as number[];
-    if (familyValues.length === 0 || weightValues.length === 0) return;
-    const weightStr = weightValues.join(";");
+    if (familyValues.length === 0) return;
     const familyParams = familyValues
-      .map((f) => `family=${f.replace(/ /g, "+")}:wght@${weightStr}`)
+      .map((f) => `family=${f.replace(/ /g, "+")}:wght@${GOOGLE_FONTS_WEIGHTS}`)
       .join("&");
     const href = `https://fonts.googleapis.com/css2?${familyParams}&display=swap`;
     let link = document.getElementById("google-fonts") as HTMLLinkElement | null;
@@ -26,5 +24,5 @@ export function useGoogleFonts(tokens: Record<string, any>) {
     if (link.href !== href) {
       link.href = href;
     }
-  }, [fontFamilyKey, fontWeightKey]);
+  }, [fontFamilyKey]);
 }
