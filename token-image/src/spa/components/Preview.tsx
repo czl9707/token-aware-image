@@ -9,7 +9,7 @@ export default function Preview() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
-  const comp = components[selectedComponent];
+  const comp = components.find((c) => c.name === selectedComponent) || components[0];
 
   // Convert real token values to CSS var references for browser context
   const cssVarTokens = toCSSVarRefs(tokens);

@@ -24,6 +24,18 @@ export function flattenToCSSVars(obj: Record<string, any>, cssPrefix = "", topLe
   return css;
 }
 
+export function setNestedValue(obj: Record<string, any>, path: string, value: any): Record<string, any> {
+  const keys = path.split(".");
+  const result = { ...obj };
+  let current: Record<string, any> = result;
+  for (let i = 0; i < keys.length - 1; i++) {
+    current[keys[i]] = { ...current[keys[i]] };
+    current = current[keys[i]];
+  }
+  current[keys[keys.length - 1]] = value;
+  return result;
+}
+
 export function toCSSVarRefs(obj: Record<string, any>, prefix = ""): Record<string, any> {
   const result: Record<string, any> = {};
   for (const [key, value] of Object.entries(obj)) {

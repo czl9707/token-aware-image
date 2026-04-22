@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import * as Accordion from "@radix-ui/react-accordion";
 import * as Slider from "@radix-ui/react-slider";
 import { useTokens } from "../context";
@@ -11,7 +11,7 @@ function useTokenValue(path: string) {
   return { value, updateToken };
 }
 
-function ColorInput({ path, label }: { path: string; label: string }) {
+const ColorInput = React.memo(function ColorInput({ path, label }: { path: string; label: string }) {
   const { value: raw, updateToken } = useTokenValue(path);
   const value = typeof raw === "string" ? raw : "#000000";
   return (
@@ -23,9 +23,9 @@ function ColorInput({ path, label }: { path: string; label: string }) {
       <span className="color-hex">{value}</span>
     </div>
   );
-}
+});
 
-function TextInput({ path, label }: { path: string; label: string }) {
+const TextInput = React.memo(function TextInput({ path, label }: { path: string; label: string }) {
   const { value: raw, updateToken } = useTokenValue(path);
   const value = typeof raw === "string" ? raw : "";
   return (
@@ -34,9 +34,9 @@ function TextInput({ path, label }: { path: string; label: string }) {
       <input type="text" className="text-input" value={value} onChange={(e) => updateToken(path, e.target.value)} />
     </div>
   );
-}
+});
 
-function SliderInput({ path, label, min = 0, max = 1, step = 0.1, integer }: { path: string; label: string; min?: number; max?: number; step?: number; integer?: boolean }) {
+const SliderInput = React.memo(function SliderInput({ path, label, min = 0, max = 1, step = 0.1, integer }: { path: string; label: string; min?: number; max?: number; step?: number; integer?: boolean }) {
   const { value: raw, updateToken } = useTokenValue(path);
   const value = typeof raw === "number" ? raw : 0;
   const display = integer ? Math.round(value) : value;
@@ -59,7 +59,7 @@ function SliderInput({ path, label, min = 0, max = 1, step = 0.1, integer }: { p
       <span className="slider-value">{display}</span>
     </div>
   );
-}
+});
 
 const CATEGORY_CONFIG: Record<string, {
   label: string;
@@ -108,23 +108,24 @@ export default function TokenEditor() {
   const [openSections, setOpenSections] = useState<string[]>([]);
   const initialized = React.useRef(false);
 
-  const sections: { key: string; label: string; children: string[] }[] = [];
-
-  for (const key of CATEGORY_ORDER) {
-    const config = CATEGORY_CONFIG[key];
-    const group = tokens[key];
-    if (config && group && typeof group === "object") {
-      sections.push({ key, label: config.label, children: Object.keys(group) });
+  const sections = useMemo(() => {
+    const result: { key: string; label: string; children: string[] }[] = [];
+    for (const key of CATEGORY_ORDER) {
+      const config = CATEGORY_CONFIG[key];
+      const group = tokens[key];
+      if (config && group && typeof group === "object") {
+        result.push({ key, label: config.label, children: Object.keys(group) });
+      }
     }
-  }
-
-  for (const key of Object.keys(tokens)) {
-    if (CATEGORY_CONFIG[key] || sections.some((s) => s.key === key)) continue;
-    const group = tokens[key];
-    if (group && typeof group === "object" && !Array.isArray(group)) {
-      sections.push({ key, label: formatLabel(key), children: Object.keys(group) });
+    for (const key of Object.keys(tokens)) {
+      if (CATEGORY_CONFIG[key] || result.some((s) => s.key === key)) continue;
+      const group = tokens[key];
+      if (group && typeof group === "object" && !Array.isArray(group)) {
+        result.push({ key, label: formatLabel(key), children: Object.keys(group) });
+      }
     }
-  }
+    return result;
+  }, [tokens]);
 
   useEffect(() => {
     if (sections.length > 0 && !initialized.current) {

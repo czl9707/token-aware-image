@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { flattenToCSSVars } from "./utils/tokens";
+import { flattenToCSSVars, setNestedValue } from "./utils/tokens";
+import { useGoogleFonts } from "./hooks/useGoogleFonts";
 
 interface ComponentInfo {
   name: string;
@@ -19,26 +20,18 @@ interface TokenContextType {
   loadPreset: (name: string) => void;
   saveAsPreset: (name: string) => void;
   components: ComponentInfo[];
-  selectedComponent: number;
-  setSelectedComponent: (i: number) => void;
+  selectedComponent: string;
+  setSelectedComponent: (name: string) => void;
   previewScopeId: string;
 }
 
 const TokenContext = createContext<TokenContextType | null>(null);
 
+const PREVIEW_SCOPE_ID = "token-preview-scope";
+const PREVIEW_SELECTOR = `.${PREVIEW_SCOPE_ID}`;
+
 export function useTokens() {
   return useContext(TokenContext)!;
-}
-
-function setNestedValue(obj: Record<string, any>, path: string, value: any) {
-  const keys = path.split(".");
-  const copy = JSON.parse(JSON.stringify(obj));
-  let current = copy;
-  for (let i = 0; i < keys.length - 1; i++) {
-    current = current[keys[i]];
-  }
-  current[keys[keys.length - 1]] = value;
-  return copy;
 }
 
 export function TokenStyleSheet({ tokens, selector }: { tokens: Record<string, any>; selector: string }) {
@@ -57,10 +50,13 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
   const [savedSnapshot, setSavedSnapshot] = useState<string>("");
   const [presets, setPresets] = useState<{ name: string; file: string }[]>([]);
   const [components, setComponents] = useState<ComponentInfo[]>([]);
-  const [selectedComponent, setSelectedComponent] = useState(0);
-  const isDirty = JSON.stringify(tokens) !== savedSnapshot;
-  const previewScopeId = "token-preview-scope";
-  const previewSelector = `.${previewScopeId}`;
+  const [selectedComponent, setSelectedComponent] = useState<string>("");
+  const isDirty = useMemo(
+    () => JSON.stringify(tokens) !== savedSnapshot,
+    [tokens, savedSnapshot]
+  );
+
+  useGoogleFonts(tokens);
 
   useEffect(() => {
     fetch("/api/tokens")
@@ -72,33 +68,6 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
     fetch("/api/presets").then((r) => r.json()).then(setPresets);
     fetch("/api/components").then((r) => r.json()).then(setComponents);
   }, []);
-
-  const fontFamilyKey = JSON.stringify(tokens.fontFamily);
-  const fontWeightKey = JSON.stringify(tokens.fontWeight);
-
-  useEffect(() => {
-    const families = tokens.fontFamily;
-    const weights = tokens.fontWeight;
-    if (!families || !weights) return;
-    const familyValues = [...new Set(Object.values(families) as string[])];
-    const weightValues = Object.values(weights) as number[];
-    if (familyValues.length === 0 || weightValues.length === 0) return;
-    const weightStr = weightValues.join(";");
-    const familyParams = familyValues
-      .map((f) => `family=${f.replace(/ /g, "+")}:wght@${weightStr}`)
-      .join("&");
-    const href = `https://fonts.googleapis.com/css2?${familyParams}&display=swap`;
-    let link = document.getElementById("google-fonts") as HTMLLinkElement | null;
-    if (!link) {
-      link = document.createElement("link");
-      link.id = "google-fonts";
-      link.rel = "stylesheet";
-      document.head.appendChild(link);
-    }
-    if (link.href !== href) {
-      link.href = href;
-    }
-  }, [fontFamilyKey, fontWeightKey]);
 
   const updateToken = useCallback((path: string, value: any) => {
     setTokens((prev) => setNestedValue(prev, path, value));
@@ -145,10 +114,10 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
         tokens, updateToken, save, discard, isDirty,
         presets, loadPreset, saveAsPreset,
         components, selectedComponent, setSelectedComponent,
-        previewScopeId,
+        previewScopeId: PREVIEW_SCOPE_ID,
       }}
     >
-      <TokenStyleSheet tokens={tokens} selector={previewSelector} />
+      <TokenStyleSheet tokens={tokens} selector={PREVIEW_SELECTOR} />
       {children}
     </TokenContext.Provider>
   );

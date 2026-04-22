@@ -30,7 +30,7 @@ export default function ComponentList() {
       <div className="component-tabs">
         <div className="component-tabs-list">
           {components.map((c, i) => (
-            <button key={c.name} className={i === selectedComponent ? "active" : ""} onClick={() => setSelectedComponent(i)}>
+            <button key={c.name} className={c.name === selectedComponent ? "active" : ""} onClick={() => setSelectedComponent(c.name)}>
               {c.name}
             </button>
           ))}
