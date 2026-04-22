@@ -71,6 +71,8 @@
 
 html, body, #root { height: 100%; font-family: var(--ed-font-body); background: rgb(var(--ed-color-bg)); color: rgb(var(--ed-color-text)); font-size: var(--ed-text-md); }
 
+.app-error { padding: var(--ed-space-2) var(--ed-space-4); background: rgb(var(--ed-color-accent) / 15%); color: rgb(var(--ed-color-accent)); font-size: var(--ed-text-sm); text-align: center; }
+
 .app { display: grid; grid-template-columns: 1fr 380px; height: 100vh; }
 
 .dirty-indicator { color: rgb(var(--ed-color-accent)); font-size: var(--ed-text-xl); line-height: 1; }

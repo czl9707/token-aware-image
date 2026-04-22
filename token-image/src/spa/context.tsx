@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { flattenToCSSVars, setNestedValue } from "./utils/tokens";
 import { useGoogleFonts } from "./hooks/useGoogleFonts";
+import * as api from "./api";
 
 interface ComponentInfo {
   name: string;
@@ -23,6 +24,7 @@ interface TokenContextType {
   selectedComponent: string;
   setSelectedComponent: (name: string) => void;
   previewScopeId: string;
+  error: string | null;
 }
 
 const TokenContext = createContext<TokenContextType | null>(null);
@@ -51,6 +53,7 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
   const [presets, setPresets] = useState<{ name: string; file: string }[]>([]);
   const [components, setComponents] = useState<ComponentInfo[]>([]);
   const [selectedComponent, setSelectedComponent] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
   const isDirty = useMemo(
     () => JSON.stringify(tokens) !== savedSnapshot,
     [tokens, savedSnapshot]
@@ -59,14 +62,14 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
   useGoogleFonts(tokens);
 
   useEffect(() => {
-    fetch("/api/tokens")
-      .then((r) => r.json())
-      .then((data) => {
+    Promise.all([
+      api.fetchTokens().then((data) => {
         setTokens(data);
         setSavedSnapshot(JSON.stringify(data));
-      });
-    fetch("/api/presets").then((r) => r.json()).then(setPresets);
-    fetch("/api/components").then((r) => r.json()).then(setComponents);
+      }),
+      api.fetchPresets().then(setPresets),
+      api.fetchComponents().then(setComponents),
+    ]).catch((err) => setError(err.message));
   }, []);
 
   const updateToken = useCallback((path: string, value: any) => {
@@ -74,38 +77,32 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const save = useCallback(() => {
-    fetch("/api/tokens", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(tokens),
-    });
+    api.saveTokens(tokens).catch((err) => setError(err.message));
     setSavedSnapshot(JSON.stringify(tokens));
   }, [tokens]);
 
   const discard = useCallback(() => {
     const prev = JSON.parse(savedSnapshot);
     setTokens(prev);
-    fetch("/api/tokens", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(prev),
-    });
+    api.saveTokens(prev).catch((err) => setError(err.message));
   }, [savedSnapshot]);
 
   const loadPreset = useCallback(async (name: string) => {
-    const res = await fetch(`/api/presets/${name}`);
-    const data = await res.json();
-    setTokens(data);
+    try {
+      const data = await api.loadPreset(name);
+      setTokens(data);
+    } catch (err: any) {
+      setError(err.message);
+    }
   }, []);
 
   const saveAsPreset = useCallback(async (name: string) => {
-    await fetch(`/api/presets/${name}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(tokens),
-    });
-    const res = await fetch("/api/presets");
-    setPresets(await res.json());
+    try {
+      await api.saveAsPreset(name, tokens);
+      setPresets(await api.fetchPresets());
+    } catch (err: any) {
+      setError(err.message);
+    }
   }, [tokens]);
 
   return (
@@ -115,6 +112,7 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
         presets, loadPreset, saveAsPreset,
         components, selectedComponent, setSelectedComponent,
         previewScopeId: PREVIEW_SCOPE_ID,
+        error,
       }}
     >
       <TokenStyleSheet tokens={tokens} selector={PREVIEW_SELECTOR} />
