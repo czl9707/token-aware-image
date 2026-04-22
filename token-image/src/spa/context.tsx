@@ -21,6 +21,7 @@ interface TokenContextType {
   components: ComponentInfo[];
   selectedComponent: number;
   setSelectedComponent: (i: number) => void;
+  previewScopeId: string;
 }
 
 const TokenContext = createContext<TokenContextType | null>(null);
@@ -40,14 +41,14 @@ function setNestedValue(obj: Record<string, any>, path: string, value: any) {
   return copy;
 }
 
-export function TokenStyleSheet({ tokens }: { tokens: Record<string, any> }) {
+export function TokenStyleSheet({ tokens, selector }: { tokens: Record<string, any>; selector: string }) {
   const styleRef = useRef<HTMLStyleElement>(null);
   const css = useMemo(() => flattenToCSSVars(tokens), [tokens]);
   useEffect(() => {
     if (styleRef.current) {
-      styleRef.current.textContent = `:root { ${css} }`;
+      styleRef.current.textContent = `${selector} { ${css} }`;
     }
-  }, [css]);
+  }, [css, selector]);
   return <style ref={styleRef} />;
 }
 
@@ -58,6 +59,8 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
   const [components, setComponents] = useState<ComponentInfo[]>([]);
   const [selectedComponent, setSelectedComponent] = useState(0);
   const isDirty = JSON.stringify(tokens) !== savedSnapshot;
+  const previewScopeId = "token-preview-scope";
+  const previewSelector = `.${previewScopeId}`;
 
   useEffect(() => {
     fetch("/api/tokens")
@@ -142,9 +145,10 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
         tokens, updateToken, save, discard, isDirty,
         presets, loadPreset, saveAsPreset,
         components, selectedComponent, setSelectedComponent,
+        previewScopeId,
       }}
     >
-      <TokenStyleSheet tokens={tokens} />
+      <TokenStyleSheet tokens={tokens} selector={previewSelector} />
       {children}
     </TokenContext.Provider>
   );

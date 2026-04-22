@@ -3,7 +3,7 @@ import { useTokens } from "../context";
 import { toCSSVarRefs } from "../utils/tokens";
 
 export default function Preview() {
-  const { tokens, components, selectedComponent } = useTokens();
+  const { tokens, components, selectedComponent, previewScopeId } = useTokens();
   const [Comp, setComp] = useState<React.ComponentType<any> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -51,7 +51,7 @@ export default function Preview() {
   );
 
   return (
-    <div className="preview-container" ref={containerRef}>
+    <div className={`preview-container ${previewScopeId}`} ref={containerRef}>
       {inner}
     </div>
   );
