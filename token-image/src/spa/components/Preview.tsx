@@ -41,7 +41,7 @@ export default function Preview() {
   const inner = components.length === 0 ? (
     <div className="empty-state">No components found in src/</div>
   ) : error ? (
-    <div className="empty-state" style={{ color: "var(--accent)" }}>Error: {error}</div>
+    <div className="empty-state" style={{ color: "var(--color-accent)" }}>Error: {error}</div>
   ) : !Comp || !comp ? (
     <div className="empty-state">Loading...</div>
   ) : (

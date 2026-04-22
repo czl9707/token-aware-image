@@ -95,7 +95,11 @@ button:disabled { opacity: 0.4; cursor: default; }
     opacity 300ms ease, border-radius 300ms ease, border-width 300ms ease;
 }
 
-.editor-panel { grid-column: 2; border-left: 1px solid rgb(var(--ed-color-border)); overflow-y: auto; background: rgb(var(--ed-color-surface)); }
+.editor-panel { grid-column: 2; border-left: 1px solid rgb(var(--ed-color-border)); overflow-y: auto; background: rgb(var(--ed-color-surface)); scrollbar-width: thin; scrollbar-color: rgb(var(--ed-color-text) / 20%) transparent; }
+.editor-panel::-webkit-scrollbar { width: 0.25rem; }
+.editor-panel::-webkit-scrollbar-track { background: transparent; }
+.editor-panel::-webkit-scrollbar-thumb { background: rgb(var(--ed-color-text) / 20%); border-radius: 0.25rem; }
+.editor-panel::-webkit-scrollbar-button { background: transparent; height: 0; }
 
 .theme-switcher { padding: var(--ed-space-3) var(--ed-space-4); border-bottom: 1px solid rgb(var(--ed-color-border)); display: flex; flex-direction: column; gap: var(--ed-space-2); }
 .theme-switcher label { font-size: var(--ed-text-xs); text-transform: uppercase; letter-spacing: 0.08em; color: rgb(var(--ed-color-text-secondary)); }
