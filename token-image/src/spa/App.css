@@ -58,7 +58,7 @@
 
 html, body, #root { height: 100%; font-family: var(--font-family-body, system-ui, -apple-system, sans-serif); background: var(--color-bg, #0A0A0A); color: var(--color-text, #E8E8E8); font-size: var(--ed-text-md); }
 
-.app { display: grid; grid-template-rows: 48px 1fr; grid-template-columns: 1fr 380px; height: 100vh; }
+.app { display: grid; grid-template-columns: 1fr 380px; height: 100vh; }
 
 .header { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--ed-space-4); background: var(--color-surface, #141414); border-bottom: 1px solid var(--color-border, #2A2A2A); gap: var(--ed-space-3); }
 .header-left { display: flex; align-items: center; gap: var(--ed-space-3); }
@@ -73,7 +73,9 @@ button.primary:hover { opacity: 0.9; }
 button:disabled { opacity: 0.4; cursor: default; }
 
 .preview-panel { overflow: auto; padding: var(--ed-space-4); display: flex; flex-direction: column; gap: var(--ed-space-4); }
-.component-tabs { display: flex; gap: var(--ed-space-1); flex-wrap: wrap; }
+.component-tabs { display: flex; gap: var(--ed-space-1); flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.component-tabs-list { display: flex; gap: var(--ed-space-1); flex-wrap: wrap; }
+.component-tabs-actions { display: flex; align-items: center; gap: var(--ed-space-2); }
 .component-tabs button { font-size: var(--ed-text-xs); padding: var(--ed-space-1) var(--ed-space-25); }
 .component-tabs button.active { background: var(--color-accent, #D71921); border-color: var(--color-accent, #D71921); color: #fff; }
 .preview-container { flex: 1; display: flex; align-items: center; justify-content: center; background: var(--color-surface, #141414); border-radius: var(--radius-md, 6px); border: 1px solid var(--color-border, #2A2A2A); overflow: hidden; position: relative; min-height: 300px; transition: background-color 300ms ease, border-color 300ms ease; }
