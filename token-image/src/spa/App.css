@@ -135,4 +135,7 @@ button:disabled { opacity: 0.4; cursor: default; }
 .slider-value { font-family: var(--font-family-mono, 'SF Mono', 'Fira Code', monospace); font-size: var(--ed-text-xs); color: var(--color-text-secondary, #888); width: 36px; text-align: right; }
 .token-row .color-hex { font-family: var(--font-family-mono, 'SF Mono', 'Fira Code', monospace); font-size: var(--ed-text-xs); color: var(--color-text-secondary, #888); width: 64px; }
 
+.toast { position: fixed; bottom: var(--ed-space-4); left: 50%; transform: translateX(-50%) translateY(16px); background: var(--color-surface, #141414); color: var(--color-text, #E8E8E8); border: 1px solid var(--color-border, #2A2A2A); border-radius: var(--radius-md, 8px); padding: var(--ed-space-3) var(--ed-space-4); font-size: var(--ed-text-md); opacity: 0; pointer-events: none; transition: opacity 0.25s ease, transform 0.25s ease; z-index: 200; white-space: nowrap; }
+.toast-visible { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+
 .empty-state { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--color-text-secondary, #888); font-size: var(--ed-text-lg); }
