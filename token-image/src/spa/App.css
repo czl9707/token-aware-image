@@ -80,11 +80,8 @@ button:disabled { opacity: 0.4; cursor: default; }
 .preview-frame { transform-origin: center center; }
 .preview-frame,
 .preview-frame * {
-  transition: color 300ms ease, background-color 300ms ease, border-color 300ms ease,
-    opacity 300ms ease, padding 300ms ease, margin 300ms ease, gap 300ms ease,
-    font-size 300ms ease, font-weight 300ms ease, line-height 300ms ease,
-    letter-spacing 300ms ease, border-radius 300ms ease, border-width 300ms ease,
-    width 300ms ease, height 300ms ease;
+  transition: background-color 300ms ease, border-color 300ms ease,
+    opacity 300ms ease, border-radius 300ms ease, border-width 300ms ease;
 }
 
 .editor-panel { grid-column: 2; border-left: 1px solid var(--color-border, #2A2A2A); overflow-y: auto; background: var(--color-surface, #141414); }

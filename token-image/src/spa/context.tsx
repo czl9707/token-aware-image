@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { flattenToCSSVars } from "./utils/tokens";
 
 interface ComponentInfo {
@@ -41,8 +41,14 @@ function setNestedValue(obj: Record<string, any>, path: string, value: any) {
 }
 
 export function TokenStyleSheet({ tokens }: { tokens: Record<string, any> }) {
-  const css = flattenToCSSVars(tokens);
-  return <style dangerouslySetInnerHTML={{ __html: `:root { ${css} }` }} />;
+  const styleRef = useRef<HTMLStyleElement>(null);
+  const css = useMemo(() => flattenToCSSVars(tokens), [tokens]);
+  useEffect(() => {
+    if (styleRef.current) {
+      styleRef.current.textContent = `:root { ${css} }`;
+    }
+  }, [css]);
+  return <style ref={styleRef} />;
 }
 
 export function TokenProvider({ children }: { children: React.ReactNode }) {
@@ -63,6 +69,9 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
     fetch("/api/presets").then((r) => r.json()).then(setPresets);
     fetch("/api/components").then((r) => r.json()).then(setComponents);
   }, []);
+
+  const fontFamilyKey = JSON.stringify(tokens.fontFamily);
+  const fontWeightKey = JSON.stringify(tokens.fontWeight);
 
   useEffect(() => {
     const families = tokens.fontFamily;
@@ -86,7 +95,7 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
     if (link.href !== href) {
       link.href = href;
     }
-  }, [tokens.fontFamily, tokens.fontWeight]);
+  }, [fontFamilyKey, fontWeightKey]);
 
   const updateToken = useCallback((path: string, value: any) => {
     setTokens((prev) => setNestedValue(prev, path, value));
@@ -115,12 +124,6 @@ export function TokenProvider({ children }: { children: React.ReactNode }) {
     const res = await fetch(`/api/presets/${name}`);
     const data = await res.json();
     setTokens(data);
-    await fetch("/api/tokens", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    setSavedSnapshot(JSON.stringify(data));
   }, []);
 
   const saveAsPreset = useCallback(async (name: string) => {

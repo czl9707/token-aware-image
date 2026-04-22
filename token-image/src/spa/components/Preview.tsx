@@ -24,44 +24,35 @@ export default function Preview() {
 
   useEffect(() => {
     if (!containerRef.current || !comp) return;
-    const observer = new ResizeObserver((entries) => {
-      const { width, height } = entries[0].contentRect;
-      if (comp) {
-        const pad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--ed-space-8")) || 32;
-        const s = Math.min((width - pad) / comp.width, (height - pad) / comp.height, 1);
-        setScale(s);
-      }
+    const el = containerRef.current;
+    const calc = () => {
+      const { width, height } = el.getBoundingClientRect();
+      const pad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--ed-space-8")) || 32;
+      return Math.min((width - pad) / comp.width, (height - pad) / comp.height, 1);
+    };
+    const observer = new ResizeObserver(() => {
+      setScale(calc());
     });
-    observer.observe(containerRef.current);
+    setScale(calc());
+    observer.observe(el);
     return () => observer.disconnect();
   }, [comp]);
 
-  if (components.length === 0) {
-    return (
-      <div className="preview-container">
-        <div className="empty-state">No components found in src/</div>
-      </div>
-    );
-  }
-  if (error) {
-    return (
-      <div className="preview-container">
-        <div className="empty-state" style={{ color: "var(--accent)" }}>Error: {error}</div>
-      </div>
-    );
-  }
-  if (!Comp || !comp) {
-    return (
-      <div className="preview-container">
-        <div className="empty-state">Loading...</div>
-      </div>
-    );
-  }
+  const inner = components.length === 0 ? (
+    <div className="empty-state">No components found in src/</div>
+  ) : error ? (
+    <div className="empty-state" style={{ color: "var(--accent)" }}>Error: {error}</div>
+  ) : !Comp || !comp ? (
+    <div className="empty-state">Loading...</div>
+  ) : (
+    <div className="preview-frame" style={{ width: comp.width, height: comp.height, transform: `scale(${scale})` }}>
+      <Comp tokens={cssVarTokens} />
+    </div>
+  );
+
   return (
     <div className="preview-container" ref={containerRef}>
-      <div className="preview-frame" style={{ width: comp.width, height: comp.height, transform: `scale(${scale})` }}>
-        <Comp tokens={cssVarTokens} />
-      </div>
+      {inner}
     </div>
   );
 }

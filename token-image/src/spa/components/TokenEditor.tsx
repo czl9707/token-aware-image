@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import * as Accordion from "@radix-ui/react-accordion";
 import * as Slider from "@radix-ui/react-slider";
 import { useTokens } from "../context";
@@ -105,6 +105,8 @@ function TokenField({ category, childKey, config }: { category: string; childKey
 
 export default function TokenEditor() {
   const { tokens } = useTokens();
+  const [openSections, setOpenSections] = useState<string[]>([]);
+  const initialized = React.useRef(false);
 
   const sections: { key: string; label: string; children: string[] }[] = [];
 
@@ -124,8 +126,15 @@ export default function TokenEditor() {
     }
   }
 
+  useEffect(() => {
+    if (sections.length > 0 && !initialized.current) {
+      initialized.current = true;
+      setOpenSections(sections.slice(0, 3).map((s) => s.label));
+    }
+  }, [sections.length]);
+
   return (
-    <Accordion.Root className="token-accordion" type="multiple" defaultValue={sections.map((s) => s.label)}>
+    <Accordion.Root className="token-accordion" type="multiple" value={openSections} onValueChange={setOpenSections}>
       {sections.map((section) => {
         const config = CATEGORY_CONFIG[section.key];
         return (

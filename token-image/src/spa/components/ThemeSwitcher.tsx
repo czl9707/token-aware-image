@@ -5,11 +5,12 @@ import { useTokens } from "../context";
 export default function ThemeSwitcher() {
   const { presets, loadPreset, saveAsPreset } = useTokens();
   const [presetName, setPresetName] = useState("");
+  const [selectedPreset, setSelectedPreset] = useState("");
 
   return (
     <div className="theme-switcher">
       <label>Switch Preset</label>
-      <Select.Root onValueChange={(v) => { if (v) loadPreset(v); }}>
+      <Select.Root value={selectedPreset} onValueChange={(v) => { if (v) { loadPreset(v); setSelectedPreset(""); } }}>
         <Select.Trigger className="select-trigger">
           <Select.Value placeholder="Select a preset..." />
           <Select.Icon className="select-icon">▾</Select.Icon>
