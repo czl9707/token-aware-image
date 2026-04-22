@@ -4,11 +4,11 @@ import * as Slider from "@radix-ui/react-slider";
 import { useTokens } from "../context";
 
 function useTokenValue(path: string) {
-  const { tokens, updateToken } = useTokens();
+  const { tokens, updateToken, previewToken } = useTokens();
   const keys = path.split(".");
   let value: any = tokens;
   for (const k of keys) value = value?.[k];
-  return { value, updateToken };
+  return { value, updateToken, previewToken };
 }
 
 const ColorInput = React.memo(function ColorInput({ path, label }: { path: string; label: string }) {
@@ -37,9 +37,10 @@ const TextInput = React.memo(function TextInput({ path, label }: { path: string;
 });
 
 const SliderInput = React.memo(function SliderInput({ path, label, min = 0, max = 1, step = 0.1, integer }: { path: string; label: string; min?: number; max?: number; step?: number; integer?: boolean }) {
-  const { value: raw, updateToken } = useTokenValue(path);
+  const { value: raw, previewToken, updateToken } = useTokenValue(path);
   const value = typeof raw === "number" ? raw : 0;
   const display = integer ? Math.round(value) : value;
+  const resolved = integer ? (v: number) => Math.round(v) : (v: number) => v;
   return (
     <div className="token-row">
       <label>{label}</label>
@@ -49,7 +50,8 @@ const SliderInput = React.memo(function SliderInput({ path, label, min = 0, max 
         min={min}
         max={max}
         step={step}
-        onValueChange={([v]) => updateToken(path, integer ? Math.round(v) : v)}
+        onValueChange={([v]) => previewToken(path, resolved(v))}
+        onValueCommit={([v]) => updateToken(path, resolved(v))}
       >
         <Slider.Track className="slider-track">
           <Slider.Range className="slider-range" />
