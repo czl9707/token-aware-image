@@ -12,11 +12,8 @@ Instead of generating a flat image, Token-Image writes React components backed b
 Prompt → AI agents write components → Token-controlled design → Render as PNG
 ```
 
-<<<<<<< Updated upstream
 https://github.com/user-attachments/assets/bf2b7956-18d4-44c9-a948-9b54b398c792
 
-=======
->>>>>>> Stashed changes
 ## Installation
 
 ### Coding agent skill (any agent)
